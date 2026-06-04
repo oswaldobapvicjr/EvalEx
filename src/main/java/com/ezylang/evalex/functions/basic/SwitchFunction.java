@@ -79,11 +79,14 @@ public class SwitchFunction extends AbstractFunction {
     while (index < parameterValues.length) {
       int next = index + 1;
       if (next < parameterValues.length) {
-        if (value.equals(evaluateParameter(expression, parameterValues[index]))) {
+        EvaluationValue other = evaluateParameter(expression, parameterValues[index]);
+        index += 2;
+
+        if (value.isNullValue() && other.isNullValue()
+            || value.getDataType() == other.getDataType() && value.compareTo(other) == 0) {
           result = parameterValues[next];
           break;
         }
-        index += 2;
       } else {
         // The default result
         result = parameterValues[index++];
