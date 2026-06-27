@@ -204,6 +204,57 @@ class StringFunctionsTest extends BaseEvaluationTest {
     assertExpressionHasExpectedResult(expression, expectedResult);
   }
 
+  /**
+   * Security tests for the STR_MATCHES function to validate protection against CWE-1333 (ReDoS -
+   * Regular Expression Denial of Service). See: https://github.com/ezylang/EvalEx/issues/570
+   */
+  @Test
+  void testMatchesPatternTooLong() {
+    // Pattern exceeds 100 character limit
+    String longPattern = "a".repeat(101);
+    assertThatThrownBy(() -> evaluate(String.format("STR_MATCHES(\"test\", \"%s\")", longPattern)))
+        .isInstanceOf(EvaluationException.class)
+        .hasMessageContaining("exceeds maximum length")
+        .hasMessageContaining("100");
+  }
+
+  @Test
+  void testMatchesNestedQuantifiers() {
+    // ReDoS pattern: (a+)+
+    assertThatThrownBy(() -> evaluate("STR_MATCHES(\"aaaaaaaab\", \"(a+)+b\")"))
+        .isInstanceOf(EvaluationException.class)
+        .hasMessageContaining("dangerous constructs")
+        .hasMessageContaining("ReDoS");
+  }
+
+  @Test
+  void testMatchesNestedAsterisk() {
+    // ReDoS pattern: (a*)*
+    assertThatThrownBy(() -> evaluate("STR_MATCHES(\"aaaaaaaab\", \"(a*)*b\")"))
+        .isInstanceOf(EvaluationException.class)
+        .hasMessageContaining("dangerous constructs");
+  }
+
+  @Test
+  void testMatchesCharacterClassQuantifier() {
+    // ReDoS pattern: [a]+
+    assertThatThrownBy(() -> evaluate("STR_MATCHES(\"test\", \"[a]+\")"))
+        .isInstanceOf(EvaluationException.class)
+        .hasMessageContaining("dangerous constructs");
+  }
+
+  @Test
+  void testMatchesValidPattern() throws EvaluationException, ParseException {
+    // Simple valid pattern should work
+    evaluate("STR_MATCHES(\"hello\", \"h.*o\")");
+  }
+
+  @Test
+  void testMatchesValidCharacterClass() throws EvaluationException, ParseException {
+    // Valid character class without quantifier should work
+    evaluate("STR_MATCHES(\"abc\", \"[abc]*\")");
+  }
+
   @ParameterizedTest
   @CsvSource(
       delimiter = ':',
