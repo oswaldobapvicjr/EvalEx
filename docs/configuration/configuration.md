@@ -177,11 +177,13 @@ ExpressionConfiguration configuration=ExpressionConfiguration.builder()
         Expression expression=new Expression("-2^2",configuration);
 ```
 
-### RegEx Timeout in Milliseconds
+### RegEx Timeout in Milliseconds[^4]
 
 Defines the maximum execution time allowed for a single regular expression matching operation.
 This parameter serves as a critical security boundary to stop Catastrophic Backtracking, which can
 freeze the CPU and lead to Denial of Service (DoS) attacks. The default value is 100 milliseconds.
+
+[^4]: Since 3.6.3
 
 ### Single Quote String Literals
 

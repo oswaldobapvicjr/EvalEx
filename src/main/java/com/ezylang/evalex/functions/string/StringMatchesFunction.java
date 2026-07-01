@@ -21,12 +21,12 @@ import com.ezylang.evalex.data.EvaluationValue;
 import com.ezylang.evalex.functions.AbstractFunction;
 import com.ezylang.evalex.functions.FunctionParameter;
 import com.ezylang.evalex.parser.Token;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.regex.PatternSyntaxException;
 
 /**
  * Returns true if the string matches the pattern.
@@ -34,7 +34,6 @@ import java.util.regex.PatternSyntaxException;
  * <p><strong>Security:</strong> Since 3.6.3, this function applies a execution timeout defined by
  * configuration property 'regexTimeoutMillis' to prevent ReDoS (Regular Expression Denial of
  * Service).
- * </ul>
  *
  * @author HSGamer
  * @see <a href="https://github.com/ezylang/EvalEx/issues/570">Issue #570 - CWE-1333 ReDoS
@@ -64,13 +63,12 @@ public class StringMatchesFunction extends AbstractFunction {
       return expression.convertValue(future.get(regexTimeoutMillis, TimeUnit.MILLISECONDS));
     } catch (TimeoutException e) {
       throw new EvaluationException(functionToken, "Regex matching timed out");
-    } catch (Exception e) {
-      // Catch all other exceptions (InterruptedException, ExecutionException, etc.)
-      if (e.getCause() instanceof PatternSyntaxException) {
-        throw new EvaluationException(
-            functionToken, "Invalid regex pattern: " + e.getCause().getMessage());
-      }
-      throw new EvaluationException(functionToken, "Regex matching failed: " + e.getMessage());
+    } catch (ExecutionException e) {
+      throw new EvaluationException(
+          functionToken, "Invalid regex pattern: " + e.getCause().getMessage());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new EvaluationException(functionToken, "Interrupted while matching");
     }
   }
 }
