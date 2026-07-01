@@ -204,6 +204,13 @@ class StringFunctionsTest extends BaseEvaluationTest {
     assertExpressionHasExpectedResult(expression, expectedResult);
   }
 
+  @Test
+  void testMatchesInvalidPattern() throws EvaluationException, ParseException {
+    assertThatThrownBy(() -> evaluate("STR_MATCHES(\"Hello World\",\"[A-ZMatching(\")"))
+        .isInstanceOf(EvaluationException.class)
+        .hasMessageContaining("Invalid regex pattern");
+  }
+
   @ParameterizedTest
   @CsvSource(
       delimiter = ':',
