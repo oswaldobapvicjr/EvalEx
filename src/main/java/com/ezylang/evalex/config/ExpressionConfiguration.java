@@ -168,6 +168,9 @@ public class ExpressionConfiguration {
   /** The default maximum depth for recursion is 2000 levels. */
   public static final int DEFAULT_MAX_RECURSION_DEPTH = 2_000;
 
+  /** The default RegEx timeout is 100 milliseconds. */
+  public static final long DEFAULT_REGEX_TIMEOUT_MILLIS = 100L;
+
   /**
    * The default date time formatters used when parsing a date string. Each format will be tried and
    * the first matching will be used.
@@ -388,6 +391,12 @@ public class ExpressionConfiguration {
 
   /** The maximum recursion depth allowed for nested expressions. */
   @Builder.Default private final int maxRecursionDepth = DEFAULT_MAX_RECURSION_DEPTH;
+
+  /**
+   * Timeout in milliseconds for RegEx matching execution. Prevents catastrophic backtracking in
+   * RegEx patterns from consuming excessive CPU resources.
+   */
+  @Builder.Default private final long regexTimeoutMillis = DEFAULT_REGEX_TIMEOUT_MILLIS;
 
   /**
    * The date-time formatters. When parsing, each format will be tried and the first matching will
