@@ -27,6 +27,7 @@ ExpressionConfiguration configuration=ExpressionConfiguration.builder()
         .maxRecursionDepth(2000)
         .operatorDictionary(ExpressionConfiguration.StandardOperatorsDictionary)
         .powerOfPrecedence(OperatorIfc.OPERATOR_PRECEDENCE_POWER)
+        .regexTimeoutMillis(100)
         .stripTrailingZeros(true)
         .structuresAllowed(true)
         .binaryAllowed(false)
@@ -182,6 +183,16 @@ ExpressionConfiguration configuration=ExpressionConfiguration.builder()
 // will now result in -4, instead of 4:
         Expression expression=new Expression("-2^2",configuration);
 ```
+
+### RegEx Timeout in Milliseconds[^4]
+
+This parameter limits the maximum runtime of a single regular expression matching operation, helping to
+mitigate ReDoS risks caused by catastrophic backtracking.
+
+Setting this value to 0 or any negative number disables the timeout enforcement completely, allowing
+regular expression evaluations to run without any time constraints. The default value is 100 milliseconds.
+
+[^4]: Since 3.6.3
 
 ### Single Quote String Literals
 

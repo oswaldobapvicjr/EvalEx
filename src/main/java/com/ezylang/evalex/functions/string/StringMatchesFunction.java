@@ -17,14 +17,21 @@ package com.ezylang.evalex.functions.string;
 
 import com.ezylang.evalex.EvaluationException;
 import com.ezylang.evalex.Expression;
+import com.ezylang.evalex.config.ExpressionConfiguration;
 import com.ezylang.evalex.data.EvaluationValue;
 import com.ezylang.evalex.functions.AbstractFunction;
 import com.ezylang.evalex.functions.FunctionParameter;
+import com.ezylang.evalex.functions.string.util.RegularExpressionUtils;
 import com.ezylang.evalex.parser.Token;
 
 /**
  * Returns true if the string matches the pattern.
  *
+ * <p><strong>Security:</strong> Since 3.6.3, this function applies a execution timeout defined by
+ * configuration property 'regexTimeoutMillis' to prevent ReDoS (Regular Expression Denial of
+ * Service).
+ *
+ * @see ExpressionConfiguration#getRegexTimeoutMillis()
  * @author HSGamer
  */
 @FunctionParameter(name = "string")
@@ -36,6 +43,6 @@ public class StringMatchesFunction extends AbstractFunction {
       throws EvaluationException {
     String string = parameterValues[0].getStringValue();
     String pattern = parameterValues[1].getStringValue();
-    return expression.convertValue(string.matches(pattern));
+    return RegularExpressionUtils.matches(expression, functionToken, string, pattern);
   }
 }
