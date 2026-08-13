@@ -28,6 +28,7 @@ import com.ezylang.evalex.parser.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
@@ -345,5 +346,76 @@ class DateTimeFunctionsTest extends BaseEvaluationTest {
             .locale(Locale.US)
             .zoneId(ZoneId.of("America/Chicago"))
             .build());
+  }
+
+  @ParameterizedTest
+  @CsvSource(
+      delimiter = '|',
+      value = {
+        // single parameter -> assumes o day ('d') at the zone of Berlin (default)
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789\")) |"
+            + " 2026-08-08T00:00:00.000+02:00[Europe/Berlin]",
+
+        // explicit unit year ('y') at the zone of Berlin
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789\"), \"y\") |"
+            + " 2026-01-01T00:00:00.000+01:00[Europe/Berlin]",
+
+        // explicit unit month ('M') at the zone of Berlin
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789\"), \"M\") |"
+            + " 2026-08-01T00:00:00.000+02:00[Europe/Berlin]",
+
+        // explicit unit day ('d') at the zone of Berlin
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789\"), \"d\") |"
+            + " 2026-08-08T00:00:00.000+02:00[Europe/Berlin]",
+
+        // explicit unit hour ('s') at the zone of Berlin
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789\"), \"H\") |"
+            + " 2026-08-08T14:00:00.000+02:00[Europe/Berlin]",
+
+        // explicit unit minute ('m') at the zone of Berlin
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789\"), \"m\") |"
+            + " 2026-08-08T14:30:00.000+02:00[Europe/Berlin]",
+
+        // explicit unit seconds ('s') at the zone of Berlin
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789\"), \"s\") |"
+            + " 2026-08-08T14:30:45.000+02:00[Europe/Berlin]",
+
+        // explicit zone with null time unit -> assumes 'd' (day) at the specified zone
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789-03:00[America/Sao_Paulo]\"), NULL,"
+            + " \"America/Sao_Paulo\") | 2026-08-08T00:00:00.000-03:00[America/Sao_Paulo]",
+
+        // explicit unit and zone
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789-03:00[America/Sao_Paulo]\"), \"H\","
+            + " \"America/Sao_Paulo\") | 2026-08-08T14:00:00.000-03:00[America/Sao_Paulo]",
+
+        // explicit unit and zone with daylight saving hour overlap scenario
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-11-01T06:30:12.345Z\"), \"H\", \"America/New_York\") |"
+            + "2026-11-01T06:00:00.000Z", // not T05:00Z
+
+        // explicit null unit and zone, apply defaults
+        "DT_TRUNCATE(DT_DATE_PARSE(\"2026-08-08T14:30:45.789\"), null, null) |"
+            + " 2026-08-08T00:00:00.000+02:00[Europe/Berlin]",
+      })
+  void testDateTimeTruncate(String expression, String expectedResult)
+      throws EvaluationException, ParseException {
+    ZonedDateTime expectedInstant = ZonedDateTime.parse(expectedResult);
+    assertExpressionHasExpectedInstant(expression, expectedInstant, DateTimeTestConfiguration);
+  }
+
+  @ParameterizedTest
+  @CsvSource(
+      delimiter = '|',
+      value = {
+        "DT_TRUNCATE(dt, \"i\") | Invalid time unit 'i'",
+        "DT_TRUNCATE(dt, \"d\", \"t\") | Time zone with id 't' not found",
+        "DT_TRUNCATE(dt, \"d\", \"America/Sao_Paulo\", \"extra\") | Too many parameters",
+        "DT_TRUNCATE(\"invalid\") | Unable to format a 'STRING' type as a date-time"
+      })
+  void testDateTimeTruncateExceptions(String expression, String errorMessageFragment)
+      throws EvaluationException, ParseException {
+
+    assertThatThrownBy(() -> new Expression(expression).with("dt", Instant.now()).evaluate())
+        .isInstanceOf(EvaluationException.class)
+        .hasMessageContaining(errorMessageFragment);
   }
 }
