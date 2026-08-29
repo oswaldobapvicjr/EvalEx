@@ -1,5 +1,5 @@
 /*
-  Copyright 2012-2024 The EvalEx Authors
+  Copyright 2012-2024 Udo Klimaschewski
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ezylang.evalex.config.ExpressionConfiguration;
-import com.ezylang.evalex.data.DataAccessorIfc;
 import com.ezylang.evalex.data.EvaluationValue;
 import com.ezylang.evalex.data.MapBasedDataAccessor;
 import com.ezylang.evalex.functions.AbstractFunction;
@@ -118,8 +117,7 @@ class PreparedExpressionTest {
           executor.submit(
               () -> {
                 MapBasedDataAccessor accessor = new MapBasedDataAccessor();
-                accessor.setData(
-                    "value", EvaluationValue.numberValue(new BigDecimal(val)));
+                accessor.setData("value", EvaluationValue.numberValue(new BigDecimal(val)));
                 return prepared.newExpression(accessor).evaluate().getNumberValue();
               }));
     }
@@ -203,8 +201,7 @@ class PreparedExpressionTest {
               Expression expression, Token functionToken, EvaluationValue... parameterValues)
               throws EvaluationException {
             EvaluationValue val = expression.getDataAccessor().getData("input");
-            return EvaluationValue.numberValue(
-                val.getNumberValue().multiply(new BigDecimal("2")));
+            return EvaluationValue.numberValue(val.getNumberValue().multiply(new BigDecimal("2")));
           }
 
           @Override
@@ -229,8 +226,7 @@ class PreparedExpressionTest {
           executor.submit(
               () -> {
                 MapBasedDataAccessor accessor = new MapBasedDataAccessor();
-                accessor.setData(
-                    "input", EvaluationValue.numberValue(new BigDecimal(val)));
+                accessor.setData("input", EvaluationValue.numberValue(new BigDecimal(val)));
                 return prepared.newExpression(accessor).evaluate().getNumberValue();
               }));
     }
@@ -294,8 +290,7 @@ class PreparedExpressionTest {
     PreparedExpression prepared = new PreparedExpression("x * 3", config);
 
     // newExpression() without accessor uses the configuration's supplier
-    assertThat(prepared.newExpression().evaluate().getNumberValue())
-        .isEqualByComparingTo("21");
+    assertThat(prepared.newExpression().evaluate().getNumberValue()).isEqualByComparingTo("21");
   }
 
   @Test
@@ -355,8 +350,7 @@ class PreparedExpressionTest {
   void testConditionalExpression() throws Exception {
     PreparedExpression prepared =
         new PreparedExpression(
-            "IF(amount > 100, \"high\", \"low\")",
-            ExpressionConfiguration.defaultConfiguration());
+            "IF(amount > 100, \"high\", \"low\")", ExpressionConfiguration.defaultConfiguration());
 
     MapBasedDataAccessor accessor1 = new MapBasedDataAccessor();
     accessor1.setData("amount", EvaluationValue.numberValue(new BigDecimal("200")));
@@ -424,8 +418,7 @@ class PreparedExpressionTest {
   @Test
   void testNestedFunctionCalls() throws Exception {
     PreparedExpression prepared =
-        new PreparedExpression(
-            "MAX(a, MIN(b, c))", ExpressionConfiguration.defaultConfiguration());
+        new PreparedExpression("MAX(a, MIN(b, c))", ExpressionConfiguration.defaultConfiguration());
 
     MapBasedDataAccessor accessor = new MapBasedDataAccessor();
     accessor.setData("a", EvaluationValue.numberValue(new BigDecimal("5")));

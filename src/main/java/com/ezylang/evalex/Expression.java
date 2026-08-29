@@ -87,6 +87,7 @@ public class Expression {
    * @param configuration the expression configuration
    * @param abstractSyntaxTree the pre-parsed AST root node (must not be null)
    * @param dataAccessor the data accessor for variable resolution during evaluation
+   * @since 3.8.0
    */
   Expression(
       String expressionString,

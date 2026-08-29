@@ -1,5 +1,5 @@
 /*
-  Copyright 2012-2024 The EvalEx Authors
+  Copyright 2012-2024 Udo Klimaschewski
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import com.ezylang.evalex.parser.ShuntingYardConverter;
 import com.ezylang.evalex.parser.Tokenizer;
 
 /**
- * A pre-parsed, immutable, thread-safe expression that can cheaply produce bound {@link
- * Expression} instances for evaluation.
+ * A pre-parsed, immutable, thread-safe expression that can cheaply produce bound {@link Expression}
+ * instances for evaluation.
  *
  * <p>Use this class when the same expression text is evaluated repeatedly with different variable
  * bindings. The expensive parsing step (tokenization and AST construction) is performed once at
@@ -50,7 +50,8 @@ import com.ezylang.evalex.parser.Tokenizer;
  * }
  * }</pre>
  *
- * @since 3.8
+ * @author oswaldo.bapvic.jr
+ * @since 3.8.0
  */
 public class PreparedExpression {
 
