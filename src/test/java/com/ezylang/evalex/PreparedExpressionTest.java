@@ -373,13 +373,15 @@ class PreparedExpressionTest {
   @Test
   void testConstantsAreAvailable() throws Exception {
     // EvalEx default constants (TRUE, FALSE, PI, E, etc.) should work
-    PreparedExpression prepared =
-        new PreparedExpression("PI", ExpressionConfiguration.defaultConfiguration());
+    ExpressionConfiguration config = ExpressionConfiguration.defaultConfiguration();
+    PreparedExpression prepared = new PreparedExpression("PI", config);
 
     MapBasedDataAccessor accessor = new MapBasedDataAccessor();
     EvaluationValue result = prepared.newExpression(accessor).evaluate();
 
-    assertThat(result.getNumberValue()).isEqualByComparingTo(new BigDecimal(Math.PI));
+    // Compare against the actual PI constant from the configuration
+    BigDecimal expectedPI = config.getDefaultConstants().get("PI").getNumberValue();
+    assertThat(result.getNumberValue()).isEqualByComparingTo(expectedPI);
   }
 
   @Test
