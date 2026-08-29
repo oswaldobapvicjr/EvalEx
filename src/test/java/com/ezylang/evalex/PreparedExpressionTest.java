@@ -98,9 +98,7 @@ class PreparedExpressionTest {
     // Both expressions share the same AST instance
     ASTNode ast1 = expr1.getAbstractSyntaxTree();
     ASTNode ast2 = expr2.getAbstractSyntaxTree();
-    assertThat(ast1)
-        .isSameAs(ast2)
-        .isSameAs(prepared.getAbstractSyntaxTree());
+    assertThat(ast1).isSameAs(ast2).isSameAs(prepared.getAbstractSyntaxTree());
   }
 
   @Test
