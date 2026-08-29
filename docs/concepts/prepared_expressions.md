@@ -1,4 +1,11 @@
-# Working with PreparedExpressions
+---
+layout: default
+title: Prepared Expressions
+parent: Concepts
+nav_order: 6
+---
+
+# Working with Prepared Expressions
 
 For applications that evaluate the same expression repeatedly with different data, EvalEx provides `PreparedExpression` to dramatically improve performance.
 
