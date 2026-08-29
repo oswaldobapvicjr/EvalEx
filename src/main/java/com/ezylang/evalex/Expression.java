@@ -93,7 +93,6 @@ public class Expression {
       ExpressionConfiguration configuration,
       ASTNode abstractSyntaxTree,
       DataAccessorIfc dataAccessor) {
-    this.constants = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     this.expressionString = expressionString;
     this.configuration = configuration;
     this.abstractSyntaxTree = abstractSyntaxTree;
